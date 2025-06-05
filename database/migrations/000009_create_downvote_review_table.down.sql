@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS downvote_review;
