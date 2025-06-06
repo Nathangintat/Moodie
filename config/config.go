@@ -3,8 +3,7 @@ package config
 import "github.com/spf13/viper"
 
 type App struct {
-	AppPort string `json:"app_port"`
-	AppEnv  string `json:"app_env"`
+	AppEnv string `json:"app_env"`
 
 	JwtSecretKey string `json:"jwt_secret_key"`
 	JwtIssuer    string `json:"jwt_issuer"`
@@ -33,8 +32,7 @@ type Config struct {
 func NewConfig() *Config {
 	return &Config{
 		App: App{
-			AppPort: viper.GetString("APP_PORT"),
-			AppEnv:  viper.GetString("APP_ENV"),
+			AppEnv: viper.GetString("APP_ENV"),
 
 			JwtSecretKey: viper.GetString("JWT_SECRET_KEY"),
 			JwtIssuer:    viper.GetString("JWT_ISSUER"),

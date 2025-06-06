@@ -108,26 +108,17 @@ func RunServer() {
 	playlistApp.Post("/insert", playlistHandler.InsertMovie)
 	playlistApp.Get("/:playlistID/item", playlistHandler.GetPlaylistMovies)
 
-	log.Println("Starting server on port:", cfg.App.AppPort)
-	if cfg.App.AppPort == "" {
-		cfg.App.AppPort = os.Getenv("PORT")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
 	}
 
-	err = app.Listen(":" + cfg.App.AppPort)
+	log.Println("Starting server on port:", port)
+
+	err = app.Listen(":" + port)
 	if err != nil {
-		log.Fatal("Error starting server: %v", err)
+		log.Fatal("Error starting server: ", err)
 	}
-
-	go func() {
-		if cfg.App.AppPort == "" {
-			cfg.App.AppPort = os.Getenv("PORT")
-		}
-
-		err := app.Listen(":" + cfg.App.AppPort)
-		if err != nil {
-			log.Fatal("Error starting server: %v", err)
-		}
-	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
