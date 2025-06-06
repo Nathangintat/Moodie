@@ -74,9 +74,6 @@ func RunServer() {
 		Format: "[${time}] ${ip} ${status} - ${latency} ${method} ${path}\n",
 	}))
 
-	defaultPath := app.Group("/")
-	defaultPath.Get("/", movieHandler.GetMovies)
-
 	api := app.Group("/api")
 	api.Post("/login", authHandler.Login)
 	api.Post("/register", userHandler.Register)
