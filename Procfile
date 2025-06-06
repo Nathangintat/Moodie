@@ -1,1 +1,1 @@
-web: ./Moodie
+web: Moodie
