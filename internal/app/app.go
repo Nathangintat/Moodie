@@ -74,17 +74,6 @@ func RunServer() {
 		Format: "[${time}] ${ip} ${status} - ${latency} ${method} ${path}\n",
 	}))
 
-	/*	if os.Getenv("APP_ENV") != "production" {
-		cfg := swagger.Config{
-			BasePath: "/api",
-			FilePath: "./docs/swagger.json",
-			Path:     "docs",
-			Title:    "Swagger API Docs",
-		}
-
-		app.Use(swagger.New(cfg))
-	}*/
-
 	api := app.Group("/api")
 	api.Post("/login", authHandler.Login)
 	api.Post("/register", userHandler.Register)
@@ -121,7 +110,7 @@ func RunServer() {
 
 	log.Println("Starting server on port:", cfg.App.AppPort)
 	if cfg.App.AppPort == "" {
-		cfg.App.AppPort = os.Getenv("APP_PORT")
+		cfg.App.AppPort = os.Getenv("PORT")
 	}
 
 	err = app.Listen(":" + cfg.App.AppPort)
@@ -131,7 +120,7 @@ func RunServer() {
 
 	go func() {
 		if cfg.App.AppPort == "" {
-			cfg.App.AppPort = os.Getenv("APP_PORT")
+			cfg.App.AppPort = os.Getenv("PORT")
 		}
 
 		err := app.Listen(":" + cfg.App.AppPort)
