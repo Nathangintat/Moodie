@@ -75,6 +75,7 @@ func RunServer() {
 	}))
 
 	api := app.Group("/api")
+	api.Post("/", movieHandler.GetMovies)
 	api.Post("/login", authHandler.Login)
 	api.Post("/register", userHandler.Register)
 
