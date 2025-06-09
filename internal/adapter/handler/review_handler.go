@@ -173,6 +173,7 @@ func (rh *reviewHandler) GetReviews(c *fiber.Ctx) error {
 		resp = append(resp, response.ReviewsResponse{
 			MovieID:       r.MovieID,
 			UserID:        r.UserID,
+			UserName:      r.UserName,
 			Content:       r.Content,
 			Rating:        r.Rating,
 			Poster:        r.Poster,

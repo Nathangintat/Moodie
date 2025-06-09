@@ -15,6 +15,7 @@ type ReviewsEntity struct {
 	ID            uint
 	MovieID       int64
 	UserID        int64
+	UserName      string
 	Content       string
 	Poster        string
 	Rating        int64

@@ -7,6 +7,7 @@ import (
 	"github.com/Nathangintat/Moodie/internal/core/domain/model"
 	"github.com/gofiber/fiber/v2/log"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type ReviewRepository interface {
@@ -87,7 +88,7 @@ func (r *reviewRepository) GetReviewByID(ctx context.Context, movieID, userID in
 
 func (r *reviewRepository) GetReviews(ctx context.Context, userID int64) ([]entity.ReviewsEntity, error) {
 	var reviews []model.Review
-	err := r.db.WithContext(ctx).Preload("Movie").Find(&reviews).Error
+	err := r.db.WithContext(ctx).Preload(clause.Associations).Find(&reviews).Error
 	if err != nil {
 		code = "[REPOSITORY] GetReviews - 1"
 		log.Errorw(code, err)
@@ -115,6 +116,7 @@ func (r *reviewRepository) GetReviews(ctx context.Context, userID int64) ([]enti
 			ID:            review.ID,
 			MovieID:       review.MovieID,
 			UserID:        review.UserID,
+			UserName:      review.User.Username,
 			Content:       review.Content,
 			Poster:        review.Movie.Poster,
 			Rating:        review.Rating,
