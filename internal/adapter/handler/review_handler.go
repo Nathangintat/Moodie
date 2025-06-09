@@ -171,6 +171,7 @@ func (rh *reviewHandler) GetReviews(c *fiber.Ctx) error {
 	var resp []response.ReviewsResponse
 	for _, r := range results {
 		resp = append(resp, response.ReviewsResponse{
+			ReviewID:      int64(r.ID),
 			MovieID:       r.MovieID,
 			UserID:        r.UserID,
 			UserName:      r.UserName,
