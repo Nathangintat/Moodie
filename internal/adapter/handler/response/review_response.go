@@ -14,9 +14,11 @@ type ReviewsResponse struct {
 	UserID        int64     `json:"user_id"`
 	ProfileImage  string    `json:"profile_image"`
 	UserName      string    `json:"username"`
+	Headline      string    `json:"headline"`
 	Content       string    `json:"content"`
 	Poster        string    `json:"poster"`
 	Rating        int64     `json:"rating"`
+	Emoji         string    `json:"emoji"`
 	VoteCount     int64     `json:"vote_count"`
 	DownvoteCount int64     `json:"downvote_count"`
 	HasVoted      bool      `json:"has_voted"`
@@ -26,8 +28,10 @@ type ReviewsResponse struct {
 
 type ReviewItemResponse struct {
 	UserID        int64     `json:"user_id"`
+	Headline      string    `json:"headline"`
 	Content       string    `json:"content"`
 	Rating        int64     `json:"rating"`
+	Emoji         string    `json:"emoji"`
 	CreatedAt     time.Time `json:"created_at"`
 	VoteCount     int64     `json:"vote_count"`
 	DownvoteCount int64     `json:"downvote_count"`

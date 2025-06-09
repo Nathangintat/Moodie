@@ -58,8 +58,10 @@ func (rh *reviewHandler) CreateReview(c *fiber.Ctx) error {
 	reqEntity := entity.ReviewEntity{
 		UserID:    int64(userID),
 		MovieID:   req.MovieID,
+		Headline:  req.Headline,
 		Content:   req.Content,
 		Rating:    req.Rating,
+		Emoji:     req.Emoji,
 		CreatedAt: time.Now(),
 	}
 
@@ -125,7 +127,9 @@ func (rh *reviewHandler) GetReviewByID(c *fiber.Ctx) error {
 		reviews = append(reviews, response.ReviewItemResponse{
 			UserID:        r.UserID,
 			Content:       r.Content,
+			Headline:      r.Headline,
 			Rating:        r.Rating,
+			Emoji:         r.Emoji,
 			CreatedAt:     r.CreatedAt,
 			VoteCount:     r.VoteCount,
 			DownvoteCount: r.DownvoteCount,
@@ -177,8 +181,10 @@ func (rh *reviewHandler) GetReviews(c *fiber.Ctx) error {
 			UserID:        r.UserID,
 			ProfileImage:  r.ProfileImage,
 			UserName:      r.UserName,
+			Headline:      r.Headline,
 			Content:       r.Content,
 			Rating:        r.Rating,
+			Emoji:         r.Emoji,
 			Poster:        r.Poster,
 			VoteCount:     r.VoteCount,
 			DownvoteCount: r.DownvoteCount,
