@@ -115,7 +115,9 @@ func (r *reviewRepository) GetReviews(ctx context.Context, userID int64) ([]enti
 		reviewItem := entity.ReviewsEntity{
 			ID:            review.ID,
 			MovieID:       review.MovieID,
+			MovieName:     review.Movie.MovieName,
 			UserID:        review.UserID,
+			ProfileImage:  review.User.ProfileImage,
 			UserName:      review.User.Username,
 			Content:       review.Content,
 			Poster:        review.Movie.Poster,

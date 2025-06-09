@@ -10,7 +10,9 @@ type ReviewResponse struct {
 type ReviewsResponse struct {
 	ReviewID      int64     `json:"review_id"`
 	MovieID       int64     `json:"movie_id"`
+	MovieName     string    `json:"movie_name"`
 	UserID        int64     `json:"user_id"`
+	ProfileImage  string    `json:"profile_image"`
 	UserName      string    `json:"username"`
 	Content       string    `json:"content"`
 	Poster        string    `json:"poster"`
