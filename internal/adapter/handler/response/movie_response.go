@@ -15,3 +15,9 @@ type MovieResponse struct {
 	Rating      float64  `json:"rating"`
 	Genres      []string `json:"genres"`
 }
+
+type SearchMovieResponse struct {
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Poster string `json:"poster"`
+}

@@ -15,6 +15,7 @@ import (
 type MovieRepository interface {
 	GetMovies(ctx context.Context, query entity.QueryString) ([]entity.MovieEntity, int64, int64, error)
 	GetMovieByID(ctx context.Context, id int64) (*entity.MovieEntity, error)
+	SearchMovie(ctx context.Context, q string) ([]entity.SearchMovie, error)
 }
 
 type movieRepository struct {
@@ -108,6 +109,30 @@ func (m *movieRepository) GetMovieByID(ctx context.Context, id int64) (*entity.M
 	}
 
 	return &resp, nil
+}
+
+func (m *movieRepository) SearchMovie(ctx context.Context, q string) ([]entity.SearchMovie, error) {
+	var movieModels []model.Movie
+
+	err := m.db.Where("movie_name ILIKE ?", "%"+q+"%").Find(&movieModels).Error
+
+	if err != nil {
+		code := "[REPOSITORY] SearchMovie - 1"
+		log.Errorw(code, err)
+		return nil, err
+	}
+
+	var resp []entity.SearchMovie
+	for _, m := range movieModels {
+
+		resp = append(resp, entity.SearchMovie{
+			ID:     m.ID,
+			Name:   m.MovieName,
+			Poster: m.Poster,
+		})
+	}
+
+	return resp, nil
 }
 
 func NewMovieRepository(db *gorm.DB) MovieRepository {

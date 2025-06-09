@@ -12,6 +12,7 @@ import (
 type MovieHandler interface {
 	GetMovies(c *fiber.Ctx) error
 	GetMovieByID(c *fiber.Ctx) error
+	SearchMovie(c *fiber.Ctx) error
 }
 
 type movieHandler struct {
@@ -123,8 +124,6 @@ func (mh *movieHandler) GetMovieByID(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(errorResp)
 	}
 
-	println(int64(claims.UserID))
-
 	idParam := c.Params("movieID")
 	movieID, err := conv.StringToInt64(idParam)
 	if err != nil {
@@ -160,6 +159,55 @@ func (mh *movieHandler) GetMovieByID(c *fiber.Ctx) error {
 	}
 
 	defaultSuccessResponse.Data = respMovie
+	return c.JSON(defaultSuccessResponse)
+}
+
+func (mh *movieHandler) SearchMovie(c *fiber.Ctx) error {
+	claims := c.Locals("user").(*entity.JwtData)
+	if claims.UserID == 0 {
+		code := "[HANDLER] SearchMovie - 1"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "Unauthorized access"
+
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResp)
+	}
+
+	keyword := c.Query("q")
+	if keyword == "" {
+		code := "[HANDLER] SearchMovie - 2"
+		log.Errorw(code)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "need query"
+
+		return c.Status(fiber.StatusBadRequest).JSON(errorResp)
+	}
+
+	results, err := mh.movieService.SearchMovie(c.Context(), keyword)
+	if err != nil {
+		code := "[HANDLER] SearchMovie - 3"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = err.Error()
+
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResp)
+	}
+
+	defaultSuccessResponse.Meta.Status = true
+	defaultSuccessResponse.Meta.Message = "Success"
+
+	respSearch := []response.SearchMovieResponse{}
+	for _, m := range results {
+		resMovieSearch := response.SearchMovieResponse{
+			ID:     m.ID,
+			Name:   m.Name,
+			Poster: m.Poster,
+		}
+
+		respSearch = append(respSearch, resMovieSearch)
+	}
+
+	defaultSuccessResponse.Data = respSearch
 	return c.JSON(defaultSuccessResponse)
 }
 

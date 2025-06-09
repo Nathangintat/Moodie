@@ -19,3 +19,9 @@ type QueryString struct {
 	OrderType string
 	Search    string
 }
+
+type SearchMovie struct {
+	ID     int64
+	Name   string
+	Poster string
+}

@@ -11,6 +11,7 @@ import (
 type MovieService interface {
 	GetMovies(ctx context.Context, query entity.QueryString) ([]entity.MovieEntity, int64, int64, error)
 	GetMovieByID(ctx context.Context, id int64) (*entity.MovieEntity, error)
+	SearchMovie(ctx context.Context, query string) ([]entity.SearchMovie, error)
 }
 
 type movieService struct {
@@ -35,6 +36,17 @@ func (m *movieService) GetMovieByID(ctx context.Context, id int64) (*entity.Movi
 		log.Errorw(code, err)
 		return nil, err
 	}
+	return result, nil
+}
+
+func (m *movieService) SearchMovie(ctx context.Context, q string) ([]entity.SearchMovie, error) {
+	result, err := m.movieRepo.SearchMovie(ctx, q)
+	if err != nil {
+		code := "[SERVICE] SearchMovie - 1"
+		log.Errorw(code, err)
+		return nil, err
+	}
+
 	return result, nil
 }
 

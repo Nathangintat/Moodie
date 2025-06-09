@@ -97,6 +97,7 @@ func RunServer() {
 	// movie
 	movieApp := api.Group("/movie")
 	movieApp.Use(middlewareAuth.CheckToken())
+	movieApp.Get("/search", movieHandler.SearchMovie)
 	movieApp.Get("/", movieHandler.GetMovies)
 	movieApp.Get("/review/:movieID", reviewHandler.GetReviewByID)
 	movieApp.Get("/:movieID", movieHandler.GetMovieByID)
