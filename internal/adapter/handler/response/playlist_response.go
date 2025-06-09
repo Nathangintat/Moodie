@@ -1,8 +1,9 @@
 package response
 
 type PlaylistResponse struct {
-	PlaylistID int64  `json:"playlist_id"`
-	Name       string `json:"name"`
+	PlaylistID    int64  `json:"playlist_id"`
+	Name          string `json:"name"`
+	PlaylistImage string `json:"playlist_image"`
 }
 
 type PlaylistItemResponse struct {

@@ -45,6 +45,16 @@ func (ph *playlistHandler) CreatePlaylist(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(errorResp)
 	}
 
+	result, err := c.FormFile("playlist_image")
+	if err != nil {
+		code := "[HANDLER] CreatePlaylist - 3"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "Invalid request body"
+
+		return c.Status(fiber.StatusBadRequest).JSON(errorResp)
+	}
+
 	if err = validatorLib.ValidateStruct(&req); err != nil {
 		code := "[HANDLER] CreatePlaylist - 3"
 		log.Errorw(code, err)
@@ -59,7 +69,7 @@ func (ph *playlistHandler) CreatePlaylist(c *fiber.Ctx) error {
 		UserID: int64(userID),
 	}
 
-	err = ph.playlistService.CreatePlaylist(c.Context(), reqEntity)
+	err = ph.playlistService.CreatePlaylist(c.Context(), reqEntity, result)
 	if err != nil {
 		code := "[HANDLER] CreatePlaylist - 4"
 		log.Errorw(code, err)
@@ -104,8 +114,9 @@ func (ph *playlistHandler) GetPlaylistByID(c *fiber.Ctx) error {
 	resp := []response.PlaylistResponse{}
 	for _, p := range results {
 		playlist := response.PlaylistResponse{
-			PlaylistID: p.ID,
-			Name:       p.Name,
+			PlaylistID:    p.ID,
+			Name:          p.Name,
+			PlaylistImage: p.PlaylistImage,
 		}
 
 		resp = append(resp, playlist)

@@ -15,7 +15,6 @@ import (
 	"syscall"
 	"time"
 
-	/*"github.com/gofiber/contrib/swagger"*/
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -53,11 +52,12 @@ func RunServer() {
 
 	// Service
 	authService := service.NewAuthService(authRepository, cfg, jwt)
-	userService := service.NewUserService(userRepository)
+	uploadService := service.NewUploadService("./uploads")
+	userService := service.NewUserService(userRepository, uploadService)
 	movieService := service.NewMovieService(movieRepository)
 	reviewService := service.NewReviewService(reviewRepository)
 	voteService := service.NewVoteService(voteRepository)
-	playlistService := service.NewPlaylistService(playlistRepository)
+	playlistService := service.NewPlaylistService(playlistRepository, uploadService)
 
 	// Handler
 	authHandler := handler.NewAuthHandler(authService)
@@ -78,18 +78,18 @@ func RunServer() {
 	api.Post("/login", authHandler.Login)
 	api.Post("/register", userHandler.Register)
 
-	adminApp := api.Group("/admin")
-	adminApp.Use(middlewareAuth.CheckToken())
-
 	// User
-	userApp := adminApp.Group("/users")
+	userApp := api.Group("/user")
+	userApp.Use(middlewareAuth.CheckToken())
 	userApp.Get("/profile", userHandler.GetUserByID)
 	userApp.Put("/update-password", userHandler.UpdatePassword)
+	userApp.Put("/change-image", userHandler.ChangeProfileImage)
 
 	//review
 	reviewApp := api.Group("/review")
 	reviewApp.Use(middlewareAuth.CheckToken())
 	reviewApp.Post("/create", reviewHandler.CreateReview)
+	reviewApp.Get("/home", reviewHandler.GetReviews)
 	reviewApp.Post("/:reviewID/upvote", voteHandler.AddUpvote)
 	reviewApp.Post("/:reviewID/downvote", voteHandler.AddDownvote)
 
@@ -110,7 +110,7 @@ func RunServer() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "3000"
+		port = "8080"
 	}
 
 	log.Println("Starting server on port:", port)

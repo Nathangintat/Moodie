@@ -16,6 +16,7 @@ import (
 type ReviewHandler interface {
 	CreateReview(c *fiber.Ctx) error
 	GetReviewByID(c *fiber.Ctx) error
+	GetReviews(c *fiber.Ctx) error
 }
 
 type reviewHandler struct {
@@ -72,11 +73,15 @@ func (rh *reviewHandler) CreateReview(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(errorResp)
 	}
 
-	defaultSuccessResponse.Meta.Status = true
-	defaultSuccessResponse.Meta.Message = "Content created successfully"
-	defaultSuccessResponse.Data = nil
+	resp := response.DefaultSuccessResponse{
+		Meta: response.Meta{
+			Status:  true,
+			Message: "success",
+		},
+		Data: nil,
+	}
 
-	return c.Status(fiber.StatusCreated).JSON(defaultSuccessResponse)
+	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
 func (rh *reviewHandler) GetReviewByID(c *fiber.Ctx) error {
@@ -132,6 +137,51 @@ func (rh *reviewHandler) GetReviewByID(c *fiber.Ctx) error {
 	resp := response.ReviewResponse{
 		MovieID: movieID,
 		Review:  reviews,
+	}
+
+	defaultSuccessResponse.Data = resp
+	return c.JSON(defaultSuccessResponse)
+}
+
+func (rh *reviewHandler) GetReviews(c *fiber.Ctx) error {
+	claims := c.Locals("user").(*entity.JwtData)
+	if claims.UserID == 0 {
+		code := "[HANDLER] GetReviews - 1"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "Unauthorized access"
+
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResp)
+	}
+
+	userID := claims.UserID
+	results, err := rh.reviewService.GetReviews(c.Context(), int64(userID))
+	if err != nil {
+		code := "[HANDLER] GetReviews - 3"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = err.Error()
+
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResp)
+	}
+
+	defaultSuccessResponse.Meta.Status = true
+	defaultSuccessResponse.Meta.Message = "Success"
+
+	var resp []response.ReviewsResponse
+	for _, r := range results {
+		resp = append(resp, response.ReviewsResponse{
+			MovieID:       r.MovieID,
+			UserID:        r.UserID,
+			Content:       r.Content,
+			Rating:        r.Rating,
+			Poster:        r.Poster,
+			VoteCount:     r.VoteCount,
+			DownvoteCount: r.DownvoteCount,
+			HasVoted:      r.HasVoted,
+			HasDownvoted:  r.HasDownvoted,
+			CreatedAt:     r.CreatedAt,
+		})
 	}
 
 	defaultSuccessResponse.Data = resp

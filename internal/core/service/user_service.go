@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"mime/multipart"
 
 	"github.com/Nathangintat/Moodie/internal/adapter/repository"
 	"github.com/Nathangintat/Moodie/internal/core/domain/entity"
@@ -14,10 +15,12 @@ type UserService interface {
 	UpdatePassword(ctx context.Context, newPass string, id int64) error
 	GetUserByID(ctx context.Context, id int64) (*entity.UserEntity, error)
 	Register(ctx context.Context, req entity.UserEntity) error
+	ChangeProfileImage(ctx context.Context, image *multipart.FileHeader, id int64) error
 }
 
 type userService struct {
-	userRepo repository.UserRepository
+	userRepo      repository.UserRepository
+	uploadService UploadService
 }
 
 func (u *userService) Register(ctx context.Context, req entity.UserEntity) error {
@@ -65,6 +68,28 @@ func (u *userService) UpdatePassword(ctx context.Context, newPass string, id int
 	return nil
 }
 
-func NewUserService(userRepo repository.UserRepository) UserService {
-	return &userService{userRepo: userRepo}
+func (u *userService) ChangeProfileImage(ctx context.Context, image *multipart.FileHeader, id int64) error {
+
+	filename, err := u.uploadService.SaveUserProfileImage(image)
+	if err != nil {
+		code = "[SERVICE] ChangeProfileImage - 1"
+		log.Errorw(code, err)
+		return err
+	}
+
+	err = u.userRepo.ChangeProfileImage(ctx, filename, id)
+	if err != nil {
+		code := "[SERVICE] ChangeProfileImage - 2"
+		log.Errorw(code, err)
+		return err
+	}
+
+	return nil
+}
+
+func NewUserService(userRepo repository.UserRepository, service UploadService) UserService {
+	return &userService{
+		userRepo:      userRepo,
+		uploadService: service,
+	}
 }

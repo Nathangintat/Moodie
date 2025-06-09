@@ -11,6 +11,7 @@ import (
 type ReviewService interface {
 	CreateReview(ctx context.Context, req entity.ReviewEntity) error
 	GetReviewByID(ctx context.Context, movieID, userID int64) ([]entity.ReviewItemEntity, error)
+	GetReviews(ctx context.Context, userID int64) ([]entity.ReviewsEntity, error)
 }
 type reviewService struct {
 	reviewRepo repository.ReviewRepository
@@ -26,6 +27,16 @@ func (r *reviewService) CreateReview(ctx context.Context, req entity.ReviewEntit
 	}
 
 	return nil
+}
+
+func (r *reviewService) GetReviews(ctx context.Context, userID int64) ([]entity.ReviewsEntity, error) {
+	reviews, err := r.reviewRepo.GetReviews(ctx, userID)
+	if err != nil {
+		code = "[SERVICE] GetReviews - 1"
+		log.Errorw(code, err)
+		return nil, err
+	}
+	return reviews, nil
 }
 
 func (r *reviewService) GetReviewByID(ctx context.Context, movieID, userID int64) ([]entity.ReviewItemEntity, error) {

@@ -12,6 +12,7 @@ import (
 type ReviewRepository interface {
 	CreateReview(ctx context.Context, req entity.ReviewEntity) error
 	GetReviewByID(ctx context.Context, movieID, userID int64) ([]entity.ReviewItemEntity, error)
+	GetReviews(ctx context.Context, userID int64) ([]entity.ReviewsEntity, error)
 }
 type reviewRepository struct {
 	db *gorm.DB
@@ -82,6 +83,51 @@ func (r *reviewRepository) GetReviewByID(ctx context.Context, movieID, userID in
 	}
 
 	return resp, err
+}
+
+func (r *reviewRepository) GetReviews(ctx context.Context, userID int64) ([]entity.ReviewsEntity, error) {
+	var reviews []model.Review
+	err := r.db.WithContext(ctx).Preload("Movie").Find(&reviews).Error
+	if err != nil {
+		code = "[REPOSITORY] GetReviews - 1"
+		log.Errorw(code, err)
+		return nil, err
+	}
+
+	resp := []entity.ReviewsEntity{}
+	for _, review := range reviews {
+		var voteCount int64
+		var downvoteCount int64
+		var hasVoted bool
+		var hasDownvoted bool
+
+		r.db.Model(&model.UpvoteReview{}).Where("review_id = ?", review.ID).Count(&voteCount)
+		r.db.Model(&model.DownvoteReview{}).Where("review_id = ?", review.ID).Count(&downvoteCount)
+
+		var tmp int64
+		r.db.Model(&model.UpvoteReview{}).Where("review_id = ? AND user_id = ?", review.ID, userID).Count(&tmp)
+		hasVoted = tmp > 0
+
+		r.db.Model(&model.DownvoteReview{}).Where("review_id = ? AND user_id = ?", review.ID, userID).Count(&tmp)
+		hasDownvoted = tmp > 0
+
+		reviewItem := entity.ReviewsEntity{
+			ID:            review.ID,
+			MovieID:       review.MovieID,
+			UserID:        review.UserID,
+			Content:       review.Content,
+			Poster:        review.Movie.Poster,
+			Rating:        review.Rating,
+			VoteCount:     voteCount,
+			DownvoteCount: downvoteCount,
+			HasVoted:      hasVoted,
+			HasDownvoted:  hasDownvoted,
+			CreatedAt:     review.CreatedAt,
+		}
+		resp = append(resp, reviewItem)
+	}
+
+	return resp, nil
 }
 
 func NewReviewRepository(db *gorm.DB) ReviewRepository {

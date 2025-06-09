@@ -13,6 +13,7 @@ type UserRepository interface {
 	UpdatePassword(ctx context.Context, newPass string, id int64) error
 	GetUserByID(ctx context.Context, id int64) (*entity.UserEntity, error)
 	Register(ctx context.Context, req entity.UserEntity) error
+	ChangeProfileImage(ctx context.Context, image string, id int64) error
 }
 
 type userRepository struct {
@@ -47,9 +48,10 @@ func (u *userRepository) GetUserByID(ctx context.Context, id int64) (*entity.Use
 	}
 
 	return &entity.UserEntity{
-		ID:       id,
-		Username: modelUser.Username,
-		Email:    modelUser.Email,
+		ID:           id,
+		Username:     modelUser.Username,
+		Email:        modelUser.Email,
+		ProfileImage: modelUser.ProfileImage,
 	}, nil
 }
 
@@ -57,6 +59,17 @@ func (u *userRepository) UpdatePassword(ctx context.Context, newPass string, id 
 	err = u.db.Model(&model.User{}).Where("id = ?", id).Update("password", newPass).Error
 	if err != nil {
 		code := "[REPOSITORY] UpdatePassword - 1"
+		log.Errorw(code, err)
+		return err
+	}
+
+	return nil
+}
+
+func (u *userRepository) ChangeProfileImage(ctx context.Context, image string, id int64) error {
+	err = u.db.Model(&model.User{}).Where("id = ?", id).Update("profile_image", image).Error
+	if err != nil {
+		code := "[REPOSITORY] ChangeProfileImage - 1"
 		log.Errorw(code, err)
 		return err
 	}

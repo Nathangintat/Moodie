@@ -19,6 +19,7 @@ type UserHandler interface {
 	UpdatePassword(c *fiber.Ctx) error
 	GetUserByID(c *fiber.Ctx) error
 	Register(c *fiber.Ctx) error
+	ChangeProfileImage(c *fiber.Ctx) error
 }
 
 type userHandler struct {
@@ -93,9 +94,10 @@ func (uh *userHandler) GetUserByID(c *fiber.Ctx) error {
 	defaultSuccessResponse.Meta.Status = true
 	defaultSuccessResponse.Meta.Message = "Success"
 	resp := response.UserResponse{
-		ID:       user.ID,
-		Username: user.Username,
-		Email:    user.Email,
+		ID:           user.ID,
+		Username:     user.Username,
+		Email:        user.Email,
+		ProfileImage: user.ProfileImage,
 	}
 	defaultSuccessResponse.Data = resp
 
@@ -143,6 +145,44 @@ func (uh *userHandler) UpdatePassword(c *fiber.Ctx) error {
 	}
 
 	err = uh.userService.UpdatePassword(c.Context(), req.NewPassword, int64(claims.UserID))
+	if err != nil {
+		code := "[HANDLER] UpdatePassword - 5"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = err.Error()
+
+		return c.Status(fiber.StatusInternalServerError).JSON(errorResp)
+	}
+
+	defaultSuccessResponse.Meta.Status = true
+	defaultSuccessResponse.Meta.Message = "Success"
+	defaultSuccessResponse.Data = nil
+
+	return c.JSON(defaultSuccessResponse)
+}
+
+func (uh *userHandler) ChangeProfileImage(c *fiber.Ctx) error {
+	claims := c.Locals("user").(*entity.JwtData)
+	if claims.UserID == 0 {
+		code := "[HANDLER] ChangeProfileImage - 1"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "Unauthorized access"
+
+		return c.Status(fiber.StatusUnauthorized).JSON(errorResp)
+	}
+
+	result, err := c.FormFile("profile_image")
+	if err != nil {
+		code := "[HANDLER] ChangeProfileImage - 2"
+		log.Errorw(code, err)
+		errorResp.Meta.Status = false
+		errorResp.Meta.Message = "Invalid request body"
+
+		return c.Status(fiber.StatusBadRequest).JSON(errorResp)
+	}
+
+	err = uh.userService.ChangeProfileImage(c.Context(), result, int64(claims.UserID))
 	if err != nil {
 		code := "[HANDLER] UpdatePassword - 5"
 		log.Errorw(code, err)

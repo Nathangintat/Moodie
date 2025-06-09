@@ -24,9 +24,10 @@ type playlistRepository struct {
 func (r *playlistRepository) CreatePlaylist(ctx context.Context, req entity.PlaylistEntity) error {
 
 	playlist := model.Playlist{
-		ID:     req.ID,
-		Name:   req.Name,
-		UserID: req.UserID,
+		ID:            req.ID,
+		Name:          req.Name,
+		UserID:        req.UserID,
+		PlaylistImage: req.PlaylistImage,
 	}
 
 	err := r.db.WithContext(ctx).Create(&playlist).Error
@@ -50,9 +51,10 @@ func (r *playlistRepository) GetPlaylistByID(ctx context.Context, userID int64) 
 	resp := []entity.PlaylistEntity{}
 	for _, p := range playlists {
 		playlist := entity.PlaylistEntity{
-			ID:     p.ID,
-			Name:   p.Name,
-			UserID: p.UserID,
+			ID:            p.ID,
+			Name:          p.Name,
+			UserID:        p.UserID,
+			PlaylistImage: p.PlaylistImage,
 		}
 		resp = append(resp, playlist)
 	}
