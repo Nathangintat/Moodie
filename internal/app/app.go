@@ -68,6 +68,7 @@ func RunServer() {
 	playlistHandler := handler.NewPlaylistHandler(playlistService)
 
 	app := fiber.New()
+	app.Static("/uploads", "./uploads")
 	app.Use(cors.New())
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
