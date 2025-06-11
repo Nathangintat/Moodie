@@ -27,6 +27,7 @@ type ReviewsResponse struct {
 }
 
 type ReviewItemResponse struct {
+	ReviewID      int64     `json:"review_id"`
 	UserID        int64     `json:"user_id"`
 	Username      string    `json:"username"`
 	ProfileImage  string    `json:"profile_image"`

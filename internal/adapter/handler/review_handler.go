@@ -125,6 +125,7 @@ func (rh *reviewHandler) GetReviewByID(c *fiber.Ctx) error {
 	var reviews []response.ReviewItemResponse
 	for _, r := range results {
 		reviews = append(reviews, response.ReviewItemResponse{
+			ReviewID:      int64(r.ID),
 			UserID:        r.UserID,
 			Username:      r.Username,
 			ProfileImage:  r.ProfileImage,
