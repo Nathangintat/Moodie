@@ -28,6 +28,8 @@ type ReviewsResponse struct {
 
 type ReviewItemResponse struct {
 	UserID        int64     `json:"user_id"`
+	Username      string    `json:"username"`
+	ProfileImage  string    `json:"profile_image"`
 	Headline      string    `json:"headline"`
 	Content       string    `json:"content"`
 	Rating        int64     `json:"rating"`

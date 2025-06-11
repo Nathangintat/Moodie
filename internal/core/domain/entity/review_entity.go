@@ -36,6 +36,8 @@ type ReviewItemEntity struct {
 	ID            uint
 	MovieID       int64
 	UserID        int64
+	ProfileImage  string
+	Username      string
 	Headline      string
 	Content       string
 	Rating        int64

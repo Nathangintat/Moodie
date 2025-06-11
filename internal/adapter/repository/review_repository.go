@@ -44,7 +44,7 @@ func (r *reviewRepository) CreateReview(ctx context.Context, req entity.ReviewEn
 
 func (r *reviewRepository) GetReviewByID(ctx context.Context, movieID, userID int64) ([]entity.ReviewItemEntity, error) {
 	var reviews []model.Review
-	err := r.db.WithContext(ctx).Where("movie_id = ?", movieID).Find(&reviews).Error
+	err := r.db.WithContext(ctx).Preload(clause.Associations).Where("movie_id = ?", movieID).Find(&reviews).Error
 	if err != nil {
 		code = "[REPOSITORY] GetReviewByID - 1"
 		log.Errorw(code, err)
@@ -73,6 +73,8 @@ func (r *reviewRepository) GetReviewByID(ctx context.Context, movieID, userID in
 			ID:            review.ID,
 			MovieID:       review.MovieID,
 			UserID:        review.UserID,
+			Username:      review.User.Username,
+			ProfileImage:  review.User.ProfileImage,
 			Headline:      review.Headline,
 			Content:       review.Content,
 			Rating:        review.Rating,
