@@ -13,7 +13,7 @@ type PlaylistService interface {
 	CreatePlaylist(ctx context.Context, req entity.PlaylistEntity, image *multipart.FileHeader) error
 	GetPlaylistByID(ctx context.Context, userID int64) ([]entity.PlaylistEntity, error)
 	InsertMovie(ctx context.Context, req *entity.PmMapEntity, userID int64) error
-	GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MovieEntity, error)
+	GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MoviePlaylistEntity, error)
 }
 type playlistService struct {
 	playlistRepo  repository.PlaylistRepository
@@ -61,7 +61,7 @@ func (p *playlistService) InsertMovie(ctx context.Context, req *entity.PmMapEnti
 	return nil
 }
 
-func (p *playlistService) GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MovieEntity, error) {
+func (p *playlistService) GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MoviePlaylistEntity, error) {
 	results, err := p.playlistRepo.GetPlaylistMovies(ctx, playlistID)
 	if err != nil {
 		code = "[SERVICE] GetPlaylistMovies - 1"

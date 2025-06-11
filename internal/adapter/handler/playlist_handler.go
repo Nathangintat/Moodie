@@ -218,9 +218,11 @@ func (ph *playlistHandler) GetPlaylistMovies(c *fiber.Ctx) error {
 	resp := []response.PlaylistItemResponse{}
 	for _, p := range results {
 		playlist := response.PlaylistItemResponse{
-			MovieID: p.ID,
-			Name:    p.Name,
-			Poster:  p.Poster,
+			MovieID:       p.ID,
+			Name:          p.Name,
+			Poster:        p.Poster,
+			PlaylistImage: p.PlaylistImage,
+			PlaylistName:  p.PlaylistName,
 		}
 
 		resp = append(resp, playlist)

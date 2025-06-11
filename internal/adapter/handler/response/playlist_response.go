@@ -7,7 +7,9 @@ type PlaylistResponse struct {
 }
 
 type PlaylistItemResponse struct {
-	MovieID int64  `json:"movie_id"`
-	Name    string `json:"name"`
-	Poster  string `json:"poster"`
+	MovieID       int64  `json:"movie_id"`
+	Name          string `json:"name"`
+	Poster        string `json:"poster"`
+	PlaylistImage string `json:"playlist_image"`
+	PlaylistName  string `json:"playlist_name"`
 }

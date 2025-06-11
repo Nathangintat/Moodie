@@ -15,7 +15,7 @@ type PlaylistRepository interface {
 	CreatePlaylist(ctx context.Context, req entity.PlaylistEntity) error
 	GetPlaylistByID(ctx context.Context, userID int64) ([]entity.PlaylistEntity, error)
 	InsertMovie(ctx context.Context, req *entity.PmMapEntity, userId int64) error
-	GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MovieEntity, error)
+	GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MoviePlaylistEntity, error)
 }
 type playlistRepository struct {
 	db *gorm.DB
@@ -98,7 +98,7 @@ func (r *playlistRepository) InsertMovie(ctx context.Context, req *entity.PmMapE
 	return nil
 }
 
-func (r *playlistRepository) GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MovieEntity, error) {
+func (r *playlistRepository) GetPlaylistMovies(ctx context.Context, playlistID int64) ([]entity.MoviePlaylistEntity, error) {
 	var playlists []model.PmMap
 	err := r.db.WithContext(ctx).Preload(clause.Associations).
 		Where("playlist_id = ?", playlistID).
@@ -109,12 +109,14 @@ func (r *playlistRepository) GetPlaylistMovies(ctx context.Context, playlistID i
 		return nil, err
 	}
 
-	resp := []entity.MovieEntity{}
+	resp := []entity.MoviePlaylistEntity{}
 	for _, p := range playlists {
-		playlist := entity.MovieEntity{
-			ID:     p.Movie.ID,
-			Name:   p.Movie.MovieName,
-			Poster: p.Movie.Poster,
+		playlist := entity.MoviePlaylistEntity{
+			ID:            p.Movie.ID,
+			Name:          p.Movie.MovieName,
+			Poster:        p.Movie.Poster,
+			PlaylistImage: p.Playlist.PlaylistImage,
+			PlaylistName:  p.Playlist.Name,
 		}
 		resp = append(resp, playlist)
 	}
